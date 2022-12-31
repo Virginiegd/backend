@@ -27,11 +27,11 @@ exports.modifySauce = (req, res, next) => {
   Sauce.findOne({ _id: req.params.id})
     .then((sauce) => {
       if (sauce.userId != req.auth.userId) {
-        res.status(401).json({ error: 'Action non authorisée' });
+        res.status(403).json({ error: 'Action non authorisée' });
       } else {
         Sauce.updateOne({ _id: req.params.id}, {...sauceObject, _id: req.params.id})
           .then(() => res.status(200).json({ message: 'Sauce modifiée avec succès !'}))
-          .catch(error => res.status(401).json({ error }));
+          .catch(error => res.status(403).json({ error }));
       }
     })
     .catch((error) => {
@@ -69,4 +69,29 @@ exports.findAllSauce = (req, res, next) => {
     Sauce.find()
       .then(sauces => res.status(200).json(sauces))
       .catch(error => res.status(400).json({ error }));
+};
+
+// Liker une sauce
+exports.likeOneSauce = async (req, res, next) => {
+  try {
+    const sauce = await Sauce.findOne({ _id: req.params.id });
+    if(!sauce.usersLiked.includes(req.body.userId) && req.body.like === 1) {
+      const like = Sauce.updateOne({ _id: req.params.id}, {
+        $inc: {likes:1},
+        $push: {usersLiked:req.body.userId}
+      })
+    } else if (!sauce.usersDisliked.includes(req.body.userId) && res.body.like === 0) {
+      const nolike = await Sauce.updateOne( {_id: req.params.id}, {
+        $inc: {likes:-1},
+        $pull: {usersLiked:req.body.userId}
+      })
+    } else if (!sauce.usersDisliked.includes(req.body.userId) && req.body.like === 0) {
+      const dislike = await Sauce.updateOne({_id:req.params.id}, {
+        $inc: {dislikes: -1},
+        $push: {usersLiked:req.body.userId}
+      })
+    } res.status(200).json({ message: 'Choix modifié avec succès'})
+  } catch (error) {
+    res.status(400).json({ error });
+  }
 };
