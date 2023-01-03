@@ -1,6 +1,7 @@
 const Sauce = require('../models/sauce');
 const fs = require('fs');
 const sauce = require('../models/sauce');
+const user = require('../models/user');
 
 // Création d'une sauce
 exports.createSauce = (req, res, next) => {
@@ -110,3 +111,4 @@ if (req.body.like === 1) {
     }).catch( error => res.status(400).json({ error }));
 } 
 };
+
