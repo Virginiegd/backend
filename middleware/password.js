@@ -17,8 +17,6 @@ module.exports = (req, res, next ) => {
     if(schema.validate(req.body.password)) {
         next();    
     } else {
-        return res.status(400).json({ error: `Le mot de passe est trop faible :${schema.validate(req.body.password, {list: true })}` });
+        return res.status(400).json({ error: `${schema.validate(req.body.password, {list: true })}` });
     }
 };
-
-// 

@@ -8,6 +8,7 @@ dotenv.config();
 const sauceRoutes = require('./routes/sauce');
 const userRoutes = require('./routes/user');
 
+mongoose.set('strictQuery',false);
 mongoose.connect(`mongodb+srv://${process.env.DB_USERPASS}@${process.env.DB_CLUSTER}.mongodb.net/?retryWrites=true&w=majority`,
   { useNewUrlParser: true,
     useUnifiedTopology: true })
