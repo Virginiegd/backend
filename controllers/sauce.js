@@ -21,25 +21,31 @@ exports.createSauce = (req, res, next) => {
 
 // Modification d'une sauce
 exports.modifySauce = (req, res, next) => {
-  const sauceObject = req.file ? {...JSON.parse(req.body.sauce),
+  const sauceObject = req.file ? {
+    ...JSON.parse(req.body.sauce),
     imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
-    } : { ...req.body };
-    
- delete sauceObject._userId;
-  Sauce.findOne({ _id: req.params.id})
+  } : { ...req.body };
+
+  delete sauceObject._userId;
+  Sauce.findOne({ _id: req.params.id })
     .then((sauce) => {
       if (sauce.userId != req.auth.userId) {
         res.status(403).json({ error: 'Action non authorisée' });
       } else {
-        const filename = sauce.imageUrl.split('/images/')[1];
-        fs.unlink(`images/${filename}`, () => {
-        Sauce.updateOne({ _id: req.params.id}, {...sauceObject, _id: req.params.id })
-          .then(() => res.status(200).json({ message: 'Sauce modifiée avec succès !'}))
-          .catch(error => res.status(401).json({ error }));
-        })
-    }
-  })
-   .catch((error) => {
+        if (req.file) {
+          const filename = sauce.imageUrl.split('/images/')[1];
+          fs.unlink(`images/${filename}`, () => {
+            Sauce.updateOne({ _id: req.params.id }, { ...sauceObject, _id: req.params.id })
+              .then(() => res.status(200).json({ message: 'Sauce modifiée avec succès !' }))
+              .catch(error => res.status(401).json({ error }));
+          })
+        } else { 
+          Sauce.updateOne({ _id: req.params.id }, { ...sauceObject, _id: req.params.id })
+        .then(() => res.status(200).json({ message: 'Sauce modifiée avec succès !' }))
+        .catch(error => res.status(401).json({ error })); }
+      }                   
+    })
+    .catch((error) => {
       res.status(400).json({ error });
     });
 };
@@ -125,3 +131,10 @@ exports.likeSauce = (req, res, next) => {
         }
       )} catch (error) {res.status(400).json({ error})};
     } ;
+    
+  
+
+
+
+
+  
