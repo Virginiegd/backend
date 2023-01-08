@@ -8,9 +8,14 @@ const MIME_TYPES = {
 };
 
 const storage = multer.diskStorage({
+    // Enregistre les fichier dans le dossier image
     destination: (req, file, callback) => {
         callback(null, 'images' );
     },
+    /** Utilise le nom d'origine des fichier 
+     * Remplace les espaces par des _
+     * Ajoute un timestamp Date.now()
+    */ 
     filename: (req, file, callback) => {
         const name = file.originalname.split(' ').join('_');
         const extension = MIME_TYPES[file.mimetype];
