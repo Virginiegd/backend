@@ -3,9 +3,15 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const path = require('path');
+
+// Sécurise l'application Express en définissant divers en-têtes HTTP
+const helmet = require('helmet');
+
+// Charge les variables d'environnement
 const dotenv = require('dotenv');
 dotenv.config();
 
+// Importe les routeurs 
 const sauceRoutes = require('./routes/sauce');
 const userRoutes = require('./routes/user');
 
@@ -30,12 +36,19 @@ app.use((req, res, next) => {
   next();
 });
 
+/**Enregistre les routes
+ * bodParser analyse les corps de requête entrants dans un middleware 
+ * avant les gestionnaires, disponibles sous la req.bodyp ropriété
+ */
 app.use(bodyParser.json());
+app.use(helmet());
+app.use(helmet.crossOriginResourcePolicy({ policy: "cross-origin" }));
 
-
+// Indique qu'il faut gérer la ressource image de manière statique
+app.use('/images', express.static(path.join(__dirname, 'images')));
 app.use('/api/sauces', sauceRoutes);
 app.use('/api/auth', userRoutes);
-app.use('/images', express.static(path.join(__dirname, 'images')));
+
 
 // Permet d'exporter l'application
 module.exports = app;

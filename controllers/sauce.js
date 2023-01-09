@@ -1,3 +1,7 @@
+/** Importe le modèle sauce
+ * Fs donne accès aux fonctions qui nous permettent
+ * de supprimer des fichiers
+ * */
 const Sauce = require('../models/sauce');
 const fs = require('fs');
 
@@ -22,12 +26,11 @@ exports.modifySauce = (req, res, next) => {
     ...JSON.parse(req.body.sauce),
     imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
   } : { ...req.body };
-
   delete sauceObject._userId;
   Sauce.findOne({ _id: req.params.id })
     .then((sauce) => {
       if (sauce.userId != req.auth.userId) {
-        res.status(403).json({ error: 'Action non authorisée' });
+        return res.status(403).json({ error: 'Action interdite' });
       } else {
         if (req.file) {
           const filename = sauce.imageUrl.split('/images/')[1];
@@ -53,7 +56,7 @@ exports.deleteSauce = (req, res, next) => {
   Sauce.findOne({ _id: req.params.id })
     .then(sauce => {
       if (sauce.userId != req.auth.userId) {
-        res.status(401).json({ error: 'Suppression non authorisée !' })
+        return res.status(403).json({ error: 'Action interdite.' });
       } else {
         const filename = sauce.imageUrl.split('/images/')[1];
         fs.unlink(`images/${filename}`, () => {
@@ -80,49 +83,51 @@ exports.findAllSauce = (req, res, next) => {
     .catch(error => res.status(400).json({ error }));
 };
 
- // Liker/disliker une sauce
-
+// Liker/disliker une sauce
 exports.likeSauce = (req, res, next) => {
-  // J'aime la sauce
+// Like
   Sauce.findOne({ _id: req.params.id })
     .then((sauce) => {
-      if (!sauce.usersLiked.includes(req.body.userId) && req.body.like === 1) {
+      if (!sauce.usersLiked.includes(req.auth.userId) && req.body.like === 1) {
         Sauce.updateOne(
           { _id: req.params.id },
           {
             $inc: { likes: 1 },
-            $push: { usersLiked: req.body.userId }
+            $push: { usersLiked: req.auth.userId }
           })
           .then(() => res.status(200).json({ message: 'Votre like a bien été enregistré !' }))
           .catch(error => res.status(400).json({ error }));
-        // Je n'aime pas la sauce
-      } else if (!sauce.usersDisliked.includes(req.body.userId) && req.body.like === -1) {
+// Dislike
+      } else if (!sauce.usersDisliked.includes(req.auth.userId) && req.body.like === -1) {
         Sauce.updateOne(
           { _id: req.params.id },
           {
             $inc: { dislikes: 1 },
-            $push: { usersDisliked: req.body.userId },
+            $push: { usersDisliked: req.auth.userId },
           })
           .then(() => res.status(200).json({ message: 'Votre dislike a bien été pris en compte.' }))
           .catch(error => res.status(400).json({ error }));
       } else {
-        if (sauce.usersLiked.includes(req.body.userId)) {
+// Supprime le like
+        if (sauce.usersLiked.includes(req.auth.userId)) {
           Sauce.updateOne(
             { _id: req.params.id },
             {
               $inc: { likes: -1 },
-              $pull: { usersLiked: req.body.userId }
-            }
-          ).then(() => res.status(200).json({ message: 'Votre like a bien été supprimé' }))
+              $pull: { usersLiked: req.auth.userId }
+            })
+            .then(() => res.status(200).json({ message: 'Votre like a bien été supprimé' }))
             .catch(error => res.status(400).json({ error }));
-        } else if (sauce.usersDisliked.includes(req.body.userId)) {
+// Supprime le dislike
+        } else if (sauce.usersDisliked.includes(req.auth.userId)) {
           Sauce.updateOne(
             { _id: req.params.id },
             {
               $inc: { dislikes: -1 },
-              $pull: { usersDisliked: req.body.userId }
+              $pull: { usersDisliked: req.auth.userId }
             }
-          ).then(() => res.status(200).json({ message: 'Votre dislike a bien été supprimé' }))
+          )
+          .then(() => res.status(200).json({ message: 'Votre dislike a bien été supprimé' }))
             .catch(error => res.status(400).json({ error }));
         }
       }

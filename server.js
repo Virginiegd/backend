@@ -4,6 +4,7 @@ const app = require('./app');
 const dotenv = require('dotenv');
 dotenv.config();
 
+// Configure le serveur
 const normalizePort = val => {
   const port = parseInt(val, 10);
 
