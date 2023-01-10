@@ -1,10 +1,12 @@
 # backend
-Commandes pour lancer le backend :
-cd backend
-npm init pour initialiser le projet
-entry points (index.js) => remplacer par server.js
-npm install -g nodemon pour redémarrer le serveur à chaque modifications
-nodemon server pour démarrer le backend
+<h1>Piiquante</h1>
+<h2>Commandes pour lancer le backend :</h2>
+<ul>
+<li>cd backend</li>
+<li>nodemon server pour démarrer le backend</li>
+<ul>
+
+Dépendances à installer :
 npm install express
 npm install mongoose pour faire le lien avec la base de données
 npm install mongoose-unique-validator ( email unique)
@@ -15,3 +17,10 @@ npm install dotenv --save pour les variables environnement
 npm install password-validator pour la création des mots de passe
 npm install email-validator pour la gestion des adresses emails
 npm install helmet pour sécuriser l'application
+
+Pour modifier les codes d'accès à la base de données :
+.env : 
+PORT = 3000
+DB_USERPASS = user1:050186 (utilisateur:motdepasse)
+DB_CLUSTER = cluster0.0goscdu (nom du cluster)
+

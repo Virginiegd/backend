@@ -22,17 +22,23 @@ exports.createSauce = (req, res, next) => {
 
 // Modification d'une sauce
 exports.modifySauce = (req, res, next) => {
-  const sauceObject = req.file ? {
-    ...JSON.parse(req.body.sauce),
-    imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
-  } : { ...req.body };
-  delete sauceObject._userId;
   Sauce.findOne({ _id: req.params.id })
     .then((sauce) => {
-      if (sauce.userId != req.auth.userId) {
-        return res.status(403).json({ error: 'Action interdite' });
+      if (sauce.userId != req.auth.userId && req.file) {
+        const filename = req.file.filename;
+        fs.unlink(`images/${filename}`, (error) => {
+          if(error) throw error;
+        })
+        return res.status(403).json({ error: 'Error' });
+      } else if (sauce.userId != req.auth.userId) {
+        return res.status(403).json({ error: 'Error' });
       } else {
         if (req.file) {
+          delete sauceObject._userId;
+          const sauceObject = req.file ? {
+            ...JSON.parse(req.body.sauce),
+            imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
+          } : { ...req.body };
           const filename = sauce.imageUrl.split('/images/')[1];
           fs.unlink(`images/${filename}`, () => {
             Sauce.updateOne({ _id: req.params.id }, { ...sauceObject, _id: req.params.id })
@@ -56,7 +62,7 @@ exports.deleteSauce = (req, res, next) => {
   Sauce.findOne({ _id: req.params.id })
     .then(sauce => {
       if (sauce.userId != req.auth.userId) {
-        return res.status(403).json({ error: 'Action interdite.' });
+        return res.status(403).json({ error: 'Error.' });
       } else {
         const filename = sauce.imageUrl.split('/images/')[1];
         fs.unlink(`images/${filename}`, () => {
