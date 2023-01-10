@@ -34,11 +34,11 @@ exports.modifySauce = (req, res, next) => {
         return res.status(403).json({ error: 'Error' });
       } else {
         if (req.file) {
-          delete sauceObject._userId;
           const sauceObject = req.file ? {
             ...JSON.parse(req.body.sauce),
             imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
-          } : { ...req.body }
+          } : { ...req.body };
+          delete sauceObject._userId;
           const filenames = sauce.imageUrl.split('/images/')[1];
           fs.unlink(`images/${filenames}`, () => {
             Sauce.updateOne({ _id: req.params.id }, { ...sauceObject, _id: req.params.id })
