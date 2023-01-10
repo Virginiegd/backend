@@ -3,7 +3,7 @@
 <ul>
 <li>cd backend</li>
 <li>nodemon server pour démarrer le backend</li>
-<ul>
+</ul>
 
 <h3>Dépendances à installer :</h3>
 <ul>
