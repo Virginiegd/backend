@@ -1,7 +1,9 @@
+<h1>Backend</h1>
 <h2>Piiquante</h2>
 <h3>Commandes pour lancer le backend :</h3>
 <ul>
     <li>cd backend</li>
+    <li>npm init : index.js => server.js (pour initier le projet)</li>
     <li>nodemon server (pour démarrer le backend)</li>
 </ul>
 
@@ -26,7 +28,12 @@
     <li> un dossier node_modules</li>
 </ul>
 
-
+<h3>Pour modifier les codes d'accès à la base de données (fichier .env) :</h3>
+<ul>
+    <li>PORT = 3000</li>
+    <li>DB_USERPASS = user1:050186 (utilisateur:motdepasse)</li>
+    <li>DB_CLUSTER = cluster0.0goscdu (nom du cluster)</li>
+</ul>
 
 
 
