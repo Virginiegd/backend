@@ -38,7 +38,7 @@ app.use((req, res, next) => {
 
 /**Enregistre les routes
  * bodParser analyse les corps de requête entrants dans un middleware 
- * avant les gestionnaires, disponibles sous la req.bodyp ropriété
+ * avant les gestionnaires, disponibles sous la req.bodypropriété
  */
 app.use(bodyParser.json());
 app.use(helmet());
